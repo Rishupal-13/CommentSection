@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import Button from "@mui/material/Button";
 import IconButton from "@mui/material/IconButton";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -7,8 +7,7 @@ function ActionButtons({
   editMode,
   setEditMode,
   index,
-  commentList,
-  setCommentList,
+
   commentObject,
   setCommentObject,
   editingIndex,
@@ -18,7 +17,9 @@ function ActionButtons({
   masterData,
   setMasterData,
   uniqueId,
-  
+  currentArray,
+  newCommentCheck,
+  setNewCommentCheck,
 }) {
   const handleEdit = () => {
     setEditingIndex(index);
@@ -26,18 +27,28 @@ function ActionButtons({
     setEditMode(true);
   };
   const handleSave = () => {
-    const updatedCommentList = [...commentList];
+    const updatedCommentList = [...masterData];
 
     // If in edit mode, replace the comment at the editingIndex
     if (editMode && editingIndex !== null) {
-      updatedCommentList[editingIndex] = commentObject;
-    } 
+      // updatedCommentList[editingIndex] = commentObject;
+      for (let i = 0; i < masterData.length; i++) {
+        if (masterData[i]?.id === uniqueId) {
+          updatedCommentList[editingIndex] = commentObject;
+        } else {
+          for (let j = 0; j < masterData[i]?.replies?.length; j++) {
+            if (masterData[i].replies[j]?.id === uniqueId) {
+              updatedCommentList[i].replies[j] = commentObject;
+            }
+          }
+        }
+      }
+    }
 
-    console.log(updatedCommentList);
-
-    setCommentList(updatedCommentList);
+    setMasterData(updatedCommentList);
     setEditMode(false);
     setEditingIndex(null);
+    setNewCommentCheck(false);
     setCommentObject({
       id: "",
       name: "",
@@ -63,26 +74,52 @@ function ActionButtons({
 
     setShowReplyBox(true);
   };
-  const handleDelete=(index) => {
-    const updatedCommentList = commentList.filter((item, i) => item.id !== uniqueId);
-    setCommentList(updatedCommentList);
+  const handleDelete = () => {
+    // Assuming 'uniqueId' is the ID of the comment you want to delete
+    const updatedMasterData = masterData
+      .map((item) => {
+        // If the current item matches the uniqueId, return null to filter it out
+        if (item.id === uniqueId) {
+          return null;
+        }
 
-  }
-  console.log(uniqueId);
+        // If the current item has replies, filter out any with the matching uniqueId
+        if (item.replies && item.replies.length > 0) {
+          item.replies = item.replies.filter((reply) => reply.id !== uniqueId);
+        }
+
+        return item;
+      })
+      .filter(Boolean);
+
+
+    setMasterData(updatedMasterData);
+    setEditingIndex(null);
+    setCommentObject({
+      id: "",
+      name: "",
+      comment: "",
+      commentedOn: null,
+      replies: [],
+    });
+    setEditMode(false);
+    setNewCommentCheck(false);
+  };
+
   return (
     <div>
       <IconButton
         size="small"
         aria-label="delete"
         sx={{
-          // position: "absolute",
           marginLeft: "368px",
           top: "0",
           right: "0",
-          color:"white",
-          background:"black"
+          color: "white",
+          background: "black",
+          fontSize: "16px",
         }}
-          onClick={() => handleDelete(index)}
+        onClick={() => handleDelete(index)}
       >
         <DeleteIcon />
       </IconButton>
@@ -98,9 +135,12 @@ function ActionButtons({
         </div>
       ) : (
         <div>
-          <Button variant="text" size="small" onClick={handleReply}>
-            Reply
-          </Button>
+          {(currentArray?.replies?.length !== 0 || newCommentCheck) && (
+            <Button variant="text" size="small" onClick={handleReply}>
+              Reply
+            </Button>
+          )}
+
           <Button variant="text" size="small" onClick={handleEdit}>
             Edit
           </Button>

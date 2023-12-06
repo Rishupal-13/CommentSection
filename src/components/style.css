@@ -1,3 +1,37 @@
-.commentBox{
-    margin: 50px;
+.commentBox {
+  align-items: start;
+  text-align: left;
+}
+.heading {
+  padding: 10px;
+}
+.postButton {
+  display: flex;
+  justify-content: right;
+  padding: 20px;
+}
+.commentField {
+  padding: 20px;
+}
+.sortingByDate {
+  display: flex;
+  margin-left: 200px;
+}
+.commentContent {
+  align-items: start;
+  text-align: left;
+  padding: 0px 15px 0px 15px;
+}
+.postedComment{
+    padding: 10px;
+}
+.commentFieldBox{
+    padding-top: 40px;
+}
+.postedName{
+    font-weight: bold;
+}
+.postComment{
+    justify-content: center;
+    display: flex;
 }

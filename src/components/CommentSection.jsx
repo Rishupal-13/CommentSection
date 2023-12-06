@@ -1,24 +1,26 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import ActionButtons from "./ActionButtons";
+import "./style.css";
 
 function CommentSection({
   commentList,
   setCommentList,
   commentObject,
   setCommentObject,
-  handleAddComments,
   index,
   masterData,
   setMasterData,
   uniqueId,
-
+  newCommentCheck,
+  setNewCommentCheck,
 }) {
   const [editMode, setEditMode] = useState(false);
   const [editingIndex, setEditingIndex] = useState(null); // New state for the editing index
   const [showReplyBox, setShowReplyBox] = useState(false);
+
   const hanldeAdd = () => {
     const newReply = {
       id: Date.now(),
@@ -29,11 +31,11 @@ function CommentSection({
     };
 
     // Update the commentList by adding the new reply to the replies field of the current comment
-    const updatedCommentList = [...commentList];
+    const updatedCommentList = [...masterData];
     updatedCommentList[editingIndex]?.replies?.push(newReply);
 
     // Update the state with the modified commentList
-    setCommentList(updatedCommentList);
+    setMasterData(updatedCommentList);
 
     // Reset the commentObject and showReplyBox
     setCommentObject({
@@ -44,9 +46,17 @@ function CommentSection({
       replies: [],
     });
     setShowReplyBox(false);
- 
+    setNewCommentCheck(true);
   };
+  const handleEditComment = (event, reply) => {
+    const commentObjectClone = { ...reply };
 
+    commentObjectClone.comment = event.target.value;
+
+    commentObjectClone.commentedOn = new Date();
+
+    setCommentObject(commentObjectClone);
+  };
   return (
     <div>
       <div style={{ paddingLeft: "30px" }}>
@@ -58,47 +68,37 @@ function CommentSection({
                 component="form"
                 sx={{
                   width: "400px",
-                  height: "130px",
+                  height: "145px",
                   marginTop: "20px",
                   background: "#cecfce",
                   paddingTop: "15px",
-                  borderRadius: "10px", 
-                  boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)", 
+                  borderRadius: "10px",
+                  boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
                 }}
               >
-                <div
-                  className="commentContent"
-                  style={{
-                    alignItems: "start",
-                    textAlign: "left",
-                    padding: "0px 15px 0px 15px",
-                  }}
-                >
+                <div className="commentContent">
                   <div
                     style={{ display: "flex", justifyContent: "space-between" }}
                   >
-                    <div className="postedName">{commentList[index]?.name}</div>
-                    <div className="postedDate">{commentList[index]?.commentedOn.toLocaleString()}</div>
+                    <div className="postedName">{reply?.name}</div>
+                    <div className="postedDate">
+                      {reply?.commentedOn.toLocaleString()}
+                    </div>
                   </div>
-                  <div className="postedComment" style={{ paddingTop: "10px" }}>
+                  <div className="postedComment">
                     {editMode && index === editingIndex ? (
                       <TextField
                         id="outlined-basic"
-                        label="Comment"
+                        label=""
                         variant="outlined"
                         size="small"
+                        defaultValue={reply?.comment}
                         onChange={(event) => {
-                          setCommentObject({
-                            ...commentList[editingIndex],
-                            comment: event.target.value,
-                            // name: commentList[editingIndex].name,
-                            // replies: commentList[editingIndex].replies,
-                            // commentedOn:""
-                          });
+                          handleEditComment(event, reply);
                         }}
                       />
                     ) : (
-                      commentList[index]?.comment
+                      reply?.comment
                     )}
                   </div>
 
@@ -106,8 +106,6 @@ function CommentSection({
                     <ActionButtons
                       editMode={editMode}
                       setEditMode={setEditMode}
-                      commentList={commentList}
-                      setCommentList={setCommentList}
                       commentObject={commentObject}
                       setCommentObject={setCommentObject}
                       editingIndex={editingIndex}
@@ -117,7 +115,10 @@ function CommentSection({
                       index={index}
                       masterData={masterData}
                       setMasterData={setMasterData}
-                      uniqueId={uniqueId}
+                      uniqueId={reply.id}
+                      currentArray={reply}
+                      newCommentCheck={newCommentCheck}
+                      setNewCommentCheck={setNewCommentCheck}
                     />
                   </div>
                 </div>
@@ -129,7 +130,7 @@ function CommentSection({
                     component="form"
                     sx={{
                       width: "400px",
-                      height: "280px",
+                      height: "220px",
                       margin: "30px",
                       background: "#cecfce",
                     }}
@@ -140,10 +141,10 @@ function CommentSection({
                         id="outlined-basic"
                         label="Name"
                         variant="outlined"
+                        size="small"
                         sx={{
                           width: "280px",
-                          backgroundColor: "white" 
-          
+                          backgroundColor: "white",
                         }}
                         onChange={(event) => {
                           setCommentObject({
@@ -154,15 +155,15 @@ function CommentSection({
                       />
                     </div>
 
-                    <div className="commentField" style={{ margin: "40px" }}>
+                    <div className="commentField">
                       <TextField
                         id="outlined-basic"
                         label="Comment"
                         variant="outlined"
+                        size="small"
                         sx={{
                           width: "280px",
-                          backgroundColor: "white" 
-          
+                          backgroundColor: "white",
                         }}
                         onChange={(event) => {
                           setCommentObject({
@@ -180,22 +181,22 @@ function CommentSection({
                   </Box>
                 </div>
               )}
-              <CommentSection
-                commentList={reply.replies}
-                setCommentList={setCommentList}
-                commentObject={commentObject}
-                setCommentObject={setCommentObject}
-                handleAddComments={handleAddComments}
-                index={index}
-                editMode={editMode}
-                setEditMode={setEditMode}
-                editingIndex={editingIndex}
-                setEditingIndex={setEditingIndex}
-                masterData={masterData}
-                setMasterData={setMasterData}
-                uniqueId={reply.id}
-
-              />
+              {reply?.replies && reply.replies.length > 0 && (
+                <CommentSection
+                  commentList={reply.replies}
+                  setCommentList={setCommentList}
+                  commentObject={commentObject}
+                  setCommentObject={setCommentObject}
+                  index={index}
+                  editingIndex={editingIndex}
+                  setEditingIndex={setEditingIndex}
+                  masterData={masterData}
+                  setMasterData={setMasterData}
+                  uniqueId={reply.id}
+                  newCommentCheck={newCommentCheck}
+                  setNewCommentCheck={setNewCommentCheck}
+                />
+              )}
             </>
           ))}
       </div>
