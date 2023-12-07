@@ -7,9 +7,12 @@ import CommentSection from "./CommentSection";
 import IconButton from "@mui/material/IconButton";
 import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
 import "./style.css";
+
 function CommentBox() {
-  const [commentList, setCommentList] = useState(commentData);
-  const [masterData, setMasterData] = useState(commentData);
+  const webData = JSON.parse(localStorage.getItem('commentKey'))
+console.log(webData);
+  const [commentList, setCommentList] = useState([]);
+  const [masterData, setMasterData] = useState(localStorage.getItem("commentKey")==null?[]: JSON.parse(localStorage.getItem("commentKey")));
   const [commentObject, setCommentObject] = useState({
     id: "",
     name: "",
@@ -24,6 +27,7 @@ function CommentBox() {
   const [newCommentCheck, setNewCommentCheck] = useState(false);
 
   const handlePost = () => {
+    debugger;
     if (
       commentObject.name.trim() === "" ||
       commentObject.comment.trim() === ""
@@ -39,14 +43,12 @@ function CommentBox() {
       commentedOn: new Date(),
       replies: [],
     };
+    debugger;
 
-    if (editMode && editingIndex !== null) {
-      const updatedCommentList = [...masterData];
-      updatedCommentList[editingIndex] = newCommentObject;
-      setMasterData(updatedCommentList);
-    } else {
+  
       setMasterData([...masterData, newCommentObject]);
-    }
+      localStorage.setItem("commentKey", JSON.stringify([...masterData, newCommentObject]));
+    
 
     setCommentObject({
       id: "",
@@ -73,6 +75,7 @@ function CommentBox() {
     });
 
     setMasterData(sortedCommentList);
+    localStorage.setItem("commentKey", JSON.stringify(sortedCommentList));
     setIsAscending(!isAscending); // Toggle the sorting order
   };
 
@@ -155,12 +158,12 @@ function CommentBox() {
           </IconButton>
         </div>
         <CommentSection
-          commentList={masterData}
+          commentList={webData}
           setCommentList={setCommentList}
           commentObject={commentObject}
           setCommentObject={setCommentObject}
           uniqueId={uniqueId}
-          masterData={masterData}
+          masterData={webData}
           setMasterData={setMasterData}
           newCommentCheck={newCommentCheck}
           setNewCommentCheck={setNewCommentCheck}

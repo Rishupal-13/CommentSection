@@ -36,6 +36,7 @@ function CommentSection({
 
     // Update the state with the modified commentList
     setMasterData(updatedCommentList);
+    localStorage.setItem("commentKey", JSON.stringify(updatedCommentList));
 
     // Reset the commentObject and showReplyBox
     setCommentObject({

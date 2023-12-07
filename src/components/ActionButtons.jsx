@@ -46,6 +46,7 @@ function ActionButtons({
     }
 
     setMasterData(updatedCommentList);
+    localStorage.setItem("commentKey", JSON.stringify(updatedCommentList));
     setEditMode(false);
     setEditingIndex(null);
     setNewCommentCheck(false);
@@ -94,6 +95,7 @@ function ActionButtons({
 
 
     setMasterData(updatedMasterData);
+    localStorage.setItem("commentKey", JSON.stringify(updatedMasterData));
     setEditingIndex(null);
     setCommentObject({
       id: "",
