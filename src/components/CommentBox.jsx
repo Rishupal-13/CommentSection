@@ -2,8 +2,7 @@ import React, { useEffect, useState } from "react";
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
-import { commentData } from "../Data/commentsData";
-import CommentSection from "./CommentSection";
+import CommentSection from "./CommentSection"
 import IconButton from "@mui/material/IconButton";
 import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
 import "./style.css";
@@ -27,7 +26,10 @@ console.log(webData);
   const [newCommentCheck, setNewCommentCheck] = useState(false);
 
   const handlePost = () => {
-    debugger;
+   
+     document.getElementById("outlined-basic-comment").value="";
+     document.getElementById("outlined-basic-name").value="";
+  
     if (
       commentObject.name.trim() === "" ||
       commentObject.comment.trim() === ""
@@ -63,31 +65,25 @@ console.log(webData);
   };
   const handleSort = () => {
     const sortedCommentList = [...masterData];
-
-    sortedCommentList.sort((a, b) => {
-      const timeA = a.commentedOn.getTime();
-      const timeB = b.commentedOn.getTime();
-
+  
+    sortedCommentList?.sort((a, b) => {
+      // Ensure that both a and b have a valid commentedOn property
+      const timeA = a?.commentedOn instanceof Date ? a.commentedOn.getTime() : 0;
+      const timeB = b?.commentedOn instanceof Date ? b.commentedOn.getTime() : 0;
+  
       // Toggle between ascending and descending order
       const sortOrder = isAscending ? 1 : -1;
-
+  
       return sortOrder * (timeA - timeB);
     });
-
+  
     setMasterData(sortedCommentList);
     localStorage.setItem("commentKey", JSON.stringify(sortedCommentList));
     setIsAscending(!isAscending); // Toggle the sorting order
   };
+  
 
-  // useEffect(() => {
-  //   debugger;
-  //   if (masterData?.length !== 0) {
-  //     localStorage.setItem("commentKey", JSON.stringify(masterData));
-  //   }
-  // }, [masterData]);
-
-  // const webData = JSON.parse(localStorage.getItem("commentKey"));
-
+ 
   return (
     <div className="postComment">
       <div className="commentSection">
@@ -107,11 +103,10 @@ console.log(webData);
             <div className="heading"> Comment</div>
             <div className="nameField">
               <TextField
-                id="outlined-basic"
+                id="outlined-basic-name"
                 label="Name"
                 variant="outlined"
                 size="medium"
-                value={commentObject?.name}
                 sx={{
                   width: "350px",
                   backgroundColor: "white",
@@ -127,11 +122,10 @@ console.log(webData);
 
             <div className="commentFieldBox">
               <TextField
-                id="outlined-basic"
+                id="outlined-basic-comment"
                 label="Comment"
                 variant="outlined"
                 size="medium"
-                value={commentObject?.comment}
                 sx={{
                   width: "350px",
                   backgroundColor: "white",
